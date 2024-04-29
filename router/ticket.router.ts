@@ -1,11 +1,12 @@
 import { Router } from "express";
 import BOOK_TICKET from '../controllers/tickets/book-ticket/route';
 import GET_TICKETS from '../controllers/tickets/get-tickets/userId/route';
+import GET_ALL_TICKETS from '../controllers/tickets/route';
 import CANCEL_TICKET from '../controllers/tickets/cancel-ticket/route';
 import auth from "../middlewares/auth/auth.middleware";
 const ticketRouter = Router();
-ticketRouter.use(auth.validateUser);
-ticketRouter.post('/book-ticket', BOOK_TICKET);
-ticketRouter.put('/cancel-ticket', CANCEL_TICKET);
-ticketRouter.get('/my-tickets', GET_TICKETS);
+ticketRouter.get('/', auth.validateAdmin, GET_ALL_TICKETS);
+ticketRouter.post('/book-ticket',auth.validateUser, BOOK_TICKET);
+ticketRouter.put('/cancel-ticket',auth.validateUser, CANCEL_TICKET);
+ticketRouter.get('/my-tickets',auth.validateUser, GET_TICKETS);
 export default ticketRouter;
