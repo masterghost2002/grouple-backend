@@ -2,11 +2,14 @@ import { PrismaClient } from "@prisma/client";
 import { faker } from '@faker-js/faker';
 import fs from 'fs';
 import cryptr from "../utils/cryptr";
+import { ROLE } from "@prisma/client";
 const prisma = new PrismaClient();
+const USER_ROLES = [ROLE.AMDIN, ROLE.USER];
 const createRandomUser = () => {
     return {
         first_name: faker.person.firstName(),
         last_name: faker.person.lastName(),
+        role:USER_ROLES[Math.random()*1],
         email: faker.internet.email(),
         password: faker.internet.password(),
     }
@@ -36,6 +39,7 @@ const main = async () => {
                 first_name: user.first_name,
                 last_name: user.last_name,
                 email: user.email,
+                role:user.role,
                 hash_password: cryptr.encrypt(user.password)
             }
         });
@@ -43,7 +47,7 @@ const main = async () => {
     }
 
     const movies = faker.helpers.multiple(createRandomMovie, {
-        count: 5
+        count: 50
     });
     content.push("*************************************** Movies *************************")
     for (const movie of movies) {
