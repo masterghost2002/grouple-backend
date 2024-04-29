@@ -16,7 +16,7 @@ node_modules
 
 # Testing
 coverage
-
+seed-data.json
 # Turbo
 .turbo
 
