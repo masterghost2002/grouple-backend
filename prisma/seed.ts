@@ -30,9 +30,8 @@ const main = async () => {
     const users = faker.helpers.multiple(createRandomUser, {
         count: 5
     });
-    content = users;
-    for (const user of users)
-        await prisma.user.create({
+    for (const user of users){
+        const db_user = await prisma.user.create({
             data: {
                 first_name: user.first_name,
                 last_name: user.last_name,
@@ -40,6 +39,8 @@ const main = async () => {
                 hash_password: cryptr.encrypt(user.password)
             }
         });
+        content.push({...db_user, password:user.password})
+    }
 
     const movies = faker.helpers.multiple(createRandomMovie, {
         count: 5
