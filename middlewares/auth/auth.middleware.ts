@@ -8,6 +8,8 @@ const jwtSecret:Secret = process.env.JWT_SECRET as string;
 const cacheInstance = Cache.getCache();
 const validateToken = async (req:Request) =>{
     const access_token = req.cookies.access_token || req.headers['access_token'];
+    if(!access_token)
+        return undefined;
     const splited_token = access_token.split(' ');
 
     // there can be two case, token is from cokkies or from header if it is from header it will be in form of Bearer token
