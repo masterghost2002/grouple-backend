@@ -1,9 +1,11 @@
 import useFetch from '../hooks/useFetch';
 import type { MovieType } from '../../types';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 const serverUrl = import.meta.env.VITE_SERVER_URL;
 export default function HomePage() {
     
+    const navigate = useNavigate();
     const [page, setPage] = useState('1');
     const [limit, setLimit] = useState('10');
     const [order, setOrder] = useState('asc');
@@ -41,7 +43,7 @@ export default function HomePage() {
                         <div key={movie.id} className='flex flex-col gap-2 border-2 rounded-md p-2'>
                             <span className='text-md font-bold'>{movie.name}</span>
                             <span>Show Time: {new Date(movie.show_time).toLocaleDateString()}</span>
-                            <button className='rounded-md p-2 bg-blue-300 w-[200px] text-md font-bold cursor-pointer'>View and Book Ticket</button>
+                            <button onClick={()=>navigate('/book-ticket/'+movie.id)} className='rounded-md p-2 bg-blue-300 w-[200px] text-md font-bold cursor-pointer'>View and Book Ticket</button>
                         </div>
                     )
                 })
