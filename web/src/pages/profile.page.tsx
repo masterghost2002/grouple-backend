@@ -1,6 +1,9 @@
 import { useNavigate } from 'react-router-dom';
 import type { User } from '../../types';
 import React, { useEffect, useRef, useState } from 'react';
+import { createAxiosInstance } from '../utils/axios-instance';
+import toast from 'react-hot-toast';
+const serverUrl = import.meta.env.VITE_SERVER_URL;
 export default function ProfilePage() {
     const inputRef = useRef<null | HTMLInputElement>(null);
     const [file, setFile] = useState<null | File>(null);
@@ -13,7 +16,21 @@ export default function ProfilePage() {
         setFile(file);
     }
     const handleUpload = async () => {
-
+        const api = createAxiosInstance();
+        const form = new FormData();
+        if(!file) return;
+        form.append('file', file);
+        try {
+            const res = await api.post(serverUrl+'/api/user/update-profile-picture', form);
+            const user = res.data.user;
+            const access_token = res.data.access_token;
+            localStorage.setItem('user-data', JSON.stringify(user));
+            localStorage.setItem('access_token', access_token);
+            toast.success('Profile updated');
+            window.location.reload();
+        } catch (error) {
+            toast.error('Failed to update profile picture');
+        }
     }
     const handleClick = () => {
         if (!inputRef.current) return;
