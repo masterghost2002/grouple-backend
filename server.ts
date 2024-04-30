@@ -22,7 +22,7 @@ const limit = rateLimit({
     legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 app.use(cors());
-app.use(limit);
+app.use('/api',limit);
 app.use(express.json());
 app.use(cookieParser());
 

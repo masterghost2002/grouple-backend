@@ -2,7 +2,8 @@ import useFetch from "../hooks/useFetch";
 import type { TicketType } from "../../types";
 import useSocket from "../hooks/useSocket";
 import { useEffect } from "react";
-const serverUrl = import.meta.env.VITE_SERVER_URL;
+import config from "../config";
+const serverUrl = config.serverUrl;
 export default function AllTicketsPage() {
     const { data: tickets, setData: setTickets, loading } = useFetch<Array<TicketType>>({ url: serverUrl + '/api/ticket?order=desc', defaultValues: [] });
     const socket = useSocket();

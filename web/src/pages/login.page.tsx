@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import config from "../config";
 export default function LoginPage() {
     const navigate = useNavigate();
     const [formData, setFormData] = useState({
@@ -14,7 +15,7 @@ export default function LoginPage() {
     };
     const handleOnSubmit = async (e:React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
-        const serverUrl = import.meta.env.VITE_SERVER_URL as string;
+        const serverUrl = config.serverUrl;
         try {
             const res = await axios.post(serverUrl+'/api/auth/sign-in', formData);
             localStorage.setItem('user-data', JSON.stringify(res.data.user));

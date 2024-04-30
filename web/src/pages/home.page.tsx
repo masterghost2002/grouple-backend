@@ -2,7 +2,7 @@ import useFetch from '../hooks/useFetch';
 import type { MovieType, User } from '../../types';
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-const serverUrl = import.meta.env.VITE_SERVER_URL;
+import config from '../config';
 export default function HomePage() {
 
     const navigate = useNavigate();
@@ -10,7 +10,7 @@ export default function HomePage() {
     const [limit, setLimit] = useState('10');
     const [order, setOrder] = useState('asc');
     const { data: movies, loading } = useFetch<Array<MovieType>>({
-        url: serverUrl + `/api/movies?page=${page}&limit=${limit}&order=${order}`,
+        url: config.serverUrl + `/api/movies?page=${page}&limit=${limit}&order=${order}`,
         defaultValues: []
     });
     const user_from_stroage = localStorage.getItem('user-data');

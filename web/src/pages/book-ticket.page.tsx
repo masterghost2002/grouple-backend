@@ -4,7 +4,8 @@ import type { MovieType } from "../../types";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { createAxiosInstance } from "../utils/axios-instance";
-const serverUrl = import.meta.env.VITE_SERVER_URL;
+import config from "../config";
+const serverUrl = config.serverUrl;
 export default function BookTicketPage() {
     const navigate = useNavigate();
     const { id: movieId } = useParams();

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {io, Socket} from 'socket.io-client';
-const serverUrl = import.meta.env.VITE_SERVER_URL;
+import config from '../config';
+const serverUrl = config.serverUrl;
 export default function useSocket():Socket | null{
     const [socket, setSocket] = useState<Socket | null>(null);
     useEffect(()=>{

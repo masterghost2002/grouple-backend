@@ -3,7 +3,8 @@ import type { User } from '../../types';
 import React, { useEffect, useRef, useState } from 'react';
 import { createAxiosInstance } from '../utils/axios-instance';
 import toast from 'react-hot-toast';
-const serverUrl = import.meta.env.VITE_SERVER_URL;
+import config from '../config';
+const serverUrl = config.serverUrl;
 export default function ProfilePage() {
     const inputRef = useRef<null | HTMLInputElement>(null);
     const [file, setFile] = useState<null | File>(null);
