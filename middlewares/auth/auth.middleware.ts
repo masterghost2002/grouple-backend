@@ -4,36 +4,29 @@ import jwt, {Secret} from 'jsonwebtoken';
 import Cache from '../../utils/cache';
 import { UserWithoutPassword } from '../../types';
 import prisma from '../../prisma';
+import { Socket } from 'socket.io';
+import { ExtendedError } from 'socket.io/dist/namespace';
 const jwtSecret:Secret = process.env.JWT_SECRET as string;
 const cacheInstance = Cache.getCache();
-const validateToken = async (req:Request) =>{
-    const access_token = req.cookies.access_token || req.headers['access_token'];
-    if(!access_token)
-        return undefined;
-    const splited_token = access_token.split(' ');
-
-    // there can be two case, token is from cokkies or from header if it is from header it will be in form of Bearer token
-    const token  = splited_token.length === 2?splited_token[1]:splited_token[0];
-    if(!token || typeof token !== 'string')
+const validateToken = async (access_token:string) =>{
+    if(!access_token || typeof access_token !== 'string')
         return undefined;
     try {
-        const result = await jwt.verify(token, jwtSecret) as UserWithoutPassword;
+        const result = await jwt.verify(access_token.replace('Bearer ', ''), jwtSecret) as UserWithoutPassword;
         if(!result) return undefined;
         return result;
     } catch (error) {
         return undefined;
     }
 }
-const findUserFromDB = async (req:Request)=>{
-    const result = await validateToken(req);
+const findUserFromDB = async (access_token:string)=>{
+    const result = await validateToken(access_token);
     if(!result) return undefined;
 
     // first check is the user available in the cache or not, if available the return from cache
     const userFromCache = cacheInstance.cache.get(result.id) as UserWithoutPassword | undefined;
-    if(userFromCache){
-        req.user = userFromCache;
+    if(userFromCache)
         return userFromCache;
-    }
     try {
         const user = await prisma.user.findUnique({
             where:{
@@ -43,7 +36,6 @@ const findUserFromDB = async (req:Request)=>{
         if(!user)
             return undefined;
         const {hash_password:_, ...latest_user} = user;
-        req.user = latest_user;
         // cache the user for 120 sec in the memory
         cacheInstance.cache.set(user.id, latest_user, 120);
         return latest_user;
@@ -52,15 +44,27 @@ const findUserFromDB = async (req:Request)=>{
     }
 }
 const validateUser = async (req:Request, res:Response, next:NextFunction)=>{
-    const user = await findUserFromDB(req);
+    const access_token = req.cookies.access_token || req.headers['access_token'];
+    const user = await findUserFromDB(access_token);
     if(!user) return res.status(401).json({isError:true, result:{message:"User not found"}});
+    req.user = user;
     next();
 }
 const validateAdmin = async (req:Request, res:Response, next:NextFunction)=>{
-    const user = await findUserFromDB(req);
+    const access_token = req.cookies.access_token || req.headers['access_token'];
+    const user = await findUserFromDB(access_token);
     if(!user) return res.status(401).json({isError:true, result:{message:"User not found"}});
     if(user.role !== ROLE.AMDIN) return res.status(400).json({isError:true, result:{message:"Invalid role"}});
+    req.user = user;
     next();
 };
-const auth = {validateAdmin, validateUser};
+const validateAdminInSocket = async (socket:Socket, next:(err?:ExtendedError | undefined)=>void)=>{
+    const access_token:string | undefined = socket.handshake.headers.authorization;
+    if(!access_token) return next(new Error('Authentication Error; token missing'));
+    const user = await findUserFromDB(access_token);
+    if(!user) return next(new Error('User not found'));
+    if(user.role !== ROLE.AMDIN) return next(new Error('User is not adming'));
+    next();
+};
+const auth = {validateAdmin, validateUser, validateAdminInSocket};
 export default auth;
