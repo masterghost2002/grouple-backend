@@ -14,7 +14,7 @@ export default async function GET(req:Request, res:Response){
             }
         });
         if(movie)
-        cacheInstance.cache.set(movie.id, 60);
+        cacheInstance.cache.set(movie.id,movie, 60);
         return res.status(200).json(movie);
     } catch (error) {
         return res.status(500).json("Internal server error");
