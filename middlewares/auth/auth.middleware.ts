@@ -1,9 +1,11 @@
 import {Response, Request, NextFunction} from 'express';
+import { ROLE } from '@prisma/client';
 import jwt, {Secret} from 'jsonwebtoken';
+import Cache from '../../utils/cache';
 import { UserWithoutPassword } from '../../types';
 import prisma from '../../prisma';
-import { ROLE } from '@prisma/client';
 const jwtSecret:Secret = process.env.JWT_SECRET as string;
+const cacheInstance = Cache.getCache();
 const validateToken = async (req:Request) =>{
     const access_token = req.cookies.access_token || req.headers['access_token'];
     const splited_token = access_token.split(' ');
@@ -23,6 +25,13 @@ const validateToken = async (req:Request) =>{
 const findUserFromDB = async (req:Request)=>{
     const result = await validateToken(req);
     if(!result) return undefined;
+
+    // first check is the user available in the cache or not, if available the return from cache
+    const userFromCache = cacheInstance.cache.get(result.id) as UserWithoutPassword | undefined;
+    if(userFromCache){
+        req.user = userFromCache;
+        return userFromCache;
+    }
     try {
         const user = await prisma.user.findUnique({
             where:{
@@ -31,8 +40,11 @@ const findUserFromDB = async (req:Request)=>{
         });
         if(!user)
             return undefined;
-        req.user = result;
-        return result;
+        const {hash_password:_, ...latest_user} = user;
+        req.user = latest_user;
+        // cache the user for 120 sec in the memory
+        cacheInstance.cache.set(user.id, latest_user, 120);
+        return latest_user;
     } catch (error) {
         return undefined;
     }
