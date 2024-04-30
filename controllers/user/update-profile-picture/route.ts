@@ -3,7 +3,9 @@ import jwtToken from "../../../utils/jwt-token";
 import prisma from "../../../prisma";
 export default async function POST(req:Request, res:Response){
     if(!req.user)
-        return res.status(404).json({isError:true, result:{message:"Unauthorized"}});
+        return res.status(401).json({isError:true, result:{message:"Unauthorized"}});
+    if(!req.file)
+        return res.status(404).json({isError:true, result:{message:"File not found"}});
     const {location, key}  = req.file as any;
     try {
         const updatedUser = await prisma.user.update({
