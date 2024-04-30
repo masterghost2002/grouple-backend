@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import bookTicketDataValidator from "./validator.schema";
 import prisma from "../../../prisma";
+import { getIO } from "../../../utils/socket-provider";
 export default async function POST(req:Request, res:Response){
+    const io = getIO();
     const data = req.body;
     if(!req.user) return res.status(404).json("Unauthorized");
     try {
@@ -46,6 +48,7 @@ export default async function POST(req:Request, res:Response){
                 },
             })
         ]);
+        io.emit('NEW_TICKET', ticket);
         return res.status(201).json(ticket);
     } catch (error) {
         return res.status(500).json("Internal Server error");
