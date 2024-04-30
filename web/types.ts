@@ -8,6 +8,8 @@ export type User = {
     first_name:string;
     last_name:string;
     id:string;
+    profilePicture?:string;
+    key?:string;
     createdAt:string;
     udpatedAt:string;
     role:"USER" | "ADMIN";
