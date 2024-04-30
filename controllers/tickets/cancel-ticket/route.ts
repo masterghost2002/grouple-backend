@@ -2,10 +2,12 @@ import { Request, Response } from "express";
 import { ROLE, TicketStatus } from "@prisma/client";
 import cancelTicketDataValidator from "./validator.schema";
 import prisma from "../../../prisma";
+import { getIO } from "../../../utils/socket-provider";
 export default async function PUT(req:Request, res:Response) {
     if(!req.user) return res.status(400).json("Unauthorized");
     const data = req.body;
     try {
+        const io = getIO();
         const validationResult = cancelTicketDataValidator.safeParse(data);
         if(!validationResult.success)
             return res.status(400).json({isError:true, result:validationResult.error.errors});
@@ -67,7 +69,7 @@ export default async function PUT(req:Request, res:Response) {
                 }
             })
         ]);
-
+        io.emit('CANCEL_TICKET', {id:new_ticket[1].id});
         return res.status(201).json(new_ticket);
     } catch (error) {
         return res.status(500).json({isError:true, result:{message:"Internal server error"}});
