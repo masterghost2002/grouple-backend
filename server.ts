@@ -1,5 +1,5 @@
 import { createServer } from 'http';
-import express, { Response } from 'express';
+import express, { NextFunction, Response, Request } from 'express';
 import rateLimit from 'express-rate-limit';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -7,6 +7,7 @@ import authRouter from './router/auth.router';
 import ticketRouter from './router/ticket.router';
 import movieRouter from './router/movie.router';
 import { initSocket } from './utils/socket-provider';
+import path from 'path';
 const PORT = process.env.PORT || 5000;
 const app = express();
 const httpServer = createServer(app);
@@ -23,6 +24,18 @@ app.use(cors());
 app.use(limit);
 app.use(express.json());
 app.use(cookieParser());
+
+// will help to server the web
+app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.path.startsWith('/api')) return next();
+    if (/(.ico|.js|.css|.jpg|.png|.map)$/i.test(req.path))
+        return next();
+    res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
+    res.header('Expires', '-1');
+    res.header('Pragma', 'no-cache');
+    res.sendFile(path.join(__dirname, './web/dist', 'index.html'));
+});
+app.use(express.static(path.join(__dirname, './web/dist')));
 app.use('/api/auth', authRouter);
 app.use('/api/ticket', ticketRouter);
 app.use('/api/movies', movieRouter);

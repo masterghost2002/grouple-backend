@@ -4,6 +4,7 @@
   "license": "MIT",
   "main": "server.ts",
   "scripts": {
+    "postinstall": "npx prisma generate",
     "dev": "nodemon",
     "build": "tsc",
     "seed": "ts-node prisma/seed.ts"
