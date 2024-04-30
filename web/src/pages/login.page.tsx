@@ -17,7 +17,7 @@ export default function LoginPage() {
         const serverUrl = import.meta.env.VITE_SERVER_URL as string;
         try {
             const res = await axios.post(serverUrl+'/api/auth/sign-in', formData);
-            localStorage.setItem('user-data', res.data.user);
+            localStorage.setItem('user-data', JSON.stringify(res.data.user));
             localStorage.setItem('access_token', res.data.access_token);
             toast.success('Redirecting to home page');
             navigate('/');

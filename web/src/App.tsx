@@ -3,6 +3,7 @@ import LoginPage from "./pages/login.page";
 import HomePage from "./pages/home.page";
 import SignUpPage from "./pages/signup.page";
 import BookTicketPage from "./pages/book-ticket.page";
+import AllTicketsPage from "./pages/all-tickets.page";
 import { Toaster } from "react-hot-toast";
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
       <Route path="/sign-in" element={<LoginPage/>}/>
       <Route path="/sign-up" element={<SignUpPage/>}/>
       <Route path="/book-ticket/:id" element={<BookTicketPage/>}/>
+      <Route path="/all-tickets" element={<AllTicketsPage/>}/>
     </Routes>
     </>
   )

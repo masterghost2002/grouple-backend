@@ -1,7 +1,7 @@
 import useFetch from '../hooks/useFetch';
-import type { MovieType } from '../../types';
+import type { MovieType, User } from '../../types';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 const serverUrl = import.meta.env.VITE_SERVER_URL;
 export default function HomePage() {
     
@@ -13,8 +13,14 @@ export default function HomePage() {
         url: serverUrl + `/api/movies?page=${page}&limit=${limit}&order=${order}`,
         defaultValues: []
     });
+    const user_from_stroage = localStorage.getItem('user-data');
+    const user = user_from_stroage?JSON.parse(user_from_stroage) as User:undefined;
+    console.log(user?.role);
     return (<div className='p-10'>
         <h1 className='text-[32px] font-bold'>Latest Movies</h1>
+        {
+            user && <Link to={'/all-tickets'} className='p-2 rounded-md bg-blue-700 text-white'>View All Tickets</Link>
+        }
         <div className='flex gap-2 my-5'>
             <span className='text-xl font-medium'>Filter Section</span>
             <div className='flex gap-2 items-center'>
