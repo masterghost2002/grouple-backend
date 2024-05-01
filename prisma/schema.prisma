@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+enum ROLE{
+  AMDIN
+  USER
+}
+enum TicketStatus{
+  CONFIRM
+  CANCELED
+}
+model User{
+  id String @id @default(cuid())
+  email String
+  first_name String 
+  last_name String?
+  profilePicture String?
+  key String?
+  hash_password String
+  role ROLE @default(USER)
+  tickets Ticket[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+model Ticket{
+  id String @id @default(cuid())
+  userID String
+  status TicketStatus @default(CONFIRM)
+  value Int @default(1)
+  user User @relation(fields: [userID], references: [id], onDelete: Cascade)
+  movieId String
+  movie Movie @relation(fields: [movieId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+model Movie{
+  id String @id @default(cuid())
+  name String
+  tickets  Ticket[]
+  show_time DateTime 
+  seat_available Int
+  ceatedAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+}
+
+
