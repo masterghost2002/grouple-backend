@@ -1,5 +1,6 @@
 const serverUrlFromEnv = import.meta.env.VITE_SERVER_URL;
+const origin = window.location.origin;
 const config  = {
-    serverUrl: !serverUrlFromEnv?'http://localhost:5000':serverUrlFromEnv as string,
+    serverUrl: !serverUrlFromEnv?origin:serverUrlFromEnv as string,
 }
 export default config;
