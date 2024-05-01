@@ -28,7 +28,5 @@ COPY --from=express-builder /app/prisma ./prisma
 RUN npm install --omit=dev
 # Copy built React app from the second stage
 COPY --from=react-builder /app/dist ./web/dist
-CMD npx prisma dev migrate
-CMD npm run seed
 CMD node server.js
 EXPOSE 5000
